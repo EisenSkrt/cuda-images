@@ -1,0 +1,24 @@
+version: '2'
+services:
+    base:
+        build:
+          context: ./base/
+          args:
+            VERSION: $VERSION
+        image: docker.io/eisenskrt/cuda-base:$VERSION
+    notebook:
+        build:
+          context: ./notebook/
+          args:
+            VERSION: $VERSION
+        image: docker.io/eisenskrt/cuda-notebook:$VERSION
+        depends_on:
+                - base
+    debugger:
+        build:
+          context: ./debugger/
+          args:
+            VERSION: $VERSION
+        image: docker.io/eisenskrt/cuda-debugger:$VERSION
+        depends_on:
+                - base
