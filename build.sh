@@ -3,6 +3,7 @@
 set -e
 
 export VERSION=$1
+export UBUNTU=$2
 
 docker compose build
 

@@ -1,51 +1,32 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# Ubuntu 22.04 (jammy)
 # https://hub.docker.com/_/ubuntu/tags?page=1&name=jammy
 
 ARG VERSION
-FROM docker.io/nvidia/cuda:$VERSION.0-runtime-ubuntu22.04
+FROM docker.io/nvidia/cuda:$VERSION.0-runtime-ubi8
 
 ARG NB_USER="jovyan"
 ARG NB_UID="1000"
 ARG NB_GID="100"
 
-# Fix: https://github.com/hadolint/hadolint/wiki/DL4006
-# Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 USER root
 
 # Install all OS dependencies for notebook server that starts but lacks all
-# features (e.g., download as all possible file formats)
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update --yes && \
-    # - apt-get upgrade is run to patch known vulnerabilities in apt-get packages as
-    #   the ubuntu base image is rebuilt too seldom sometimes (less than once a month)
-    apt-get upgrade --yes && \
-    apt-get install --yes --no-install-recommends \
-    # - bzip2 is necessary to extract the micromamba executable.
+# features (e.g., download as all possible file formats) 
+RUN yum update -y && \
+    yum install -y \
     bzip2 \
     ca-certificates \
-    fonts-liberation \
-    locales \
-    # - pandoc is used to convert notebooks to html files
-    #   it's not present in aarch64 ubuntu image, so we install it here
-    pandoc \
-    # - run-one - a wrapper script that runs no more
-    #   than one unique  instance  of  some  command with a unique set of arguments,
-    #   we use `run-one-constantly` to support `RESTARTABLE` option
-    run-one \
     sudo \
-    # - tini is installed as a helpful container entrypoint that reaps zombie
-    #   processes and such of the actual executable we want to start, see
-    #   https://github.com/krallin/tini#why-tini for details.
-    tini \
-    wget && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen
+    wget
+
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+RUN dnf install -y openssl curl ca-certificates fontconfig gzip glibc-langpack-en tar \
+    && dnf update; dnf clean all
 
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
@@ -134,12 +115,12 @@ RUN set -x && \
     jupyter lab clean && \
     rm -rf "/home/${NB_USER}/.cache/yarn" && \
     fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+    fix-permissions "/home/${NB_USER}" && \
+    pip install ipywidgets
 
 EXPOSE 8888
 
 # Configure container startup
-ENTRYPOINT ["tini", "-g", "--"]
 CMD ["start-notebook.sh"]
 
 # Copy local files as late as possible to avoid cache busting
@@ -161,6 +142,7 @@ RUN sed -re "s/c.ServerApp/c.NotebookApp/g" \
 HEALTHCHECK  --interval=15s --timeout=3s --start-period=5s --retries=3 \
     CMD wget -O- --no-verbose --tries=1 --no-check-certificate \
     http${GEN_CERT:+s}://localhost:8888${JUPYTERHUB_SERVICE_PREFIX:-/}api || exit 1
+
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

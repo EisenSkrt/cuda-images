@@ -1,7 +1,10 @@
 ARG VERSION
-FROM docker.io/nvidia/cuda:11.8.0-runtime-ubi8
+ARG UBUNTU
+FROM docker.io/nvidia/cuda:$VERSION.0-runtime-ubi8
 
-RUN dnf install -y python38 && \
+RUN yum update -y && \
+    yum install -y python38 && \
+    yum install -y git && \
     useradd jovyan
 
 USER jovyan

@@ -5,12 +5,14 @@ services:
           context: ./base/
           args:
             VERSION: $VERSION
+            UBUNTU: $UBUNTU
         image: docker.io/eisenskrt/cuda-base:$VERSION
     notebook:
         build:
           context: ./notebook/
           args:
             VERSION: $VERSION
+            UBUNTU: $UBUNTU
         image: docker.io/eisenskrt/cuda-notebook:$VERSION
         depends_on:
                 - base
@@ -19,6 +21,7 @@ services:
           context: ./debugger/
           args:
             VERSION: $VERSION
+            UBUNTU: $UBUNTU
         image: docker.io/eisenskrt/cuda-debugger:$VERSION
         depends_on:
                 - base
