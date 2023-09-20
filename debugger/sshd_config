@@ -13,4 +13,4 @@ PrintMotd no
 ## Provide a path to store PID file which is accessible by normal user for write purpose
 PidFile /opt/ssh/sshd.pid
 AcceptEnv LANG LC_*
-Subsystem       sftp    /usr/lib/openssh/sftp-server
+Subsystem       sftp    /usr/libexec/openssh/sftp-server
