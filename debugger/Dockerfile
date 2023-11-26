@@ -26,3 +26,4 @@ EXPOSE 2222
 USER roger
 
 CMD /start.sh
+ENV IMAGE_TYPE=debugger
