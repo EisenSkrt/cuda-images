@@ -10,3 +10,4 @@ RUN yum update -y && \
 USER jovyan
 
 WORKDIR /home/jovyan
+ENV IMAGE_TYPE=base
