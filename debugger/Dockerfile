@@ -1,11 +1,17 @@
 ARG VERSION
 ARG UBUNTU
-FROM docker.io/nvidia/cuda:$VERSION.0-runtime-ubi8
+FROM docker.io/nvidia/cuda:$VERSION-runtime-ubi8
 
 USER root
 
 RUN yum update -y && \
-    yum install -y python38
+    yum install -y wget make cmake gcc bzip2-devel libffi-devel zlib-devel && \
+    wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz && \
+    tar xzf Python-3.10.8.tgz && \
+    cd Python-3.10.8 && \
+    ./configure --with-system-ffi --with-computed-gotos --enable-loadable-sqlite-extensions && \
+    make -j ${nproc} && \
+    make altinstall 
 
 COPY start.sh /start.sh 
 

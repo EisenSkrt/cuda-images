@@ -4,7 +4,7 @@
 # https://hub.docker.com/_/ubuntu/tags?page=1&name=jammy
 
 ARG VERSION
-FROM docker.io/nvidia/cuda:$VERSION.0-runtime-ubi8
+FROM docker.io/nvidia/cuda:$VERSION-runtime-ubi8
 
 ARG NB_USER="jovyan"
 ARG NB_UID="1000"
