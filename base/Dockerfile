@@ -5,7 +5,7 @@ FROM docker.io/nvidia/cuda:$VERSION-runtime-ubi8
 RUN yum update -y && \
     yum install -y git && \
     yum install -y wget make cmake gcc bzip2-devel libffi-devel zlib-devel && \
-    useradd jovyan
+    useradd roger
 
 RUN wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz && \
     tar xzf Python-3.10.8.tgz && \
@@ -14,7 +14,7 @@ RUN wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz && \
     make -j ${nproc} && \
     make altinstall
 
-USER jovyan
+USER roger
 
-WORKDIR /home/jovyan
+WORKDIR /home/roger
 ENV IMAGE_TYPE=base
